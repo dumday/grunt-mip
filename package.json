@@ -1,7 +1,7 @@
 {
   "name": "grunt-mip",
   "description": "A grunt-mocha-istanbul-phantomjs task for tesing client-side javascript",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "homepage": "https://github.com/zudd/grunt-mip",
   "author": "Zudd <luuhug@gmail.com> (Hung Luu)",
   "repository": {
