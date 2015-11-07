@@ -137,6 +137,10 @@ module.exports = function(grunt) {
 			phantomjs.halt();
 		});
 
+		phantomjs.on('coverage.done', function(covData){
+			saveCov(covData);
+		});
+
 		phantomjs.on('blanket:fileDone', function(thisTotal, filename) {
 
 			if (status.blanketPass === 0 && status.blanketFail === 0 ) {
@@ -218,10 +222,6 @@ module.exports = function(grunt) {
 			}
 		};
 	}());
-
-	phantomjs.on('coverage.done', function(covData){
-		saveCov(covData);
-	});
 
 	// Built-in error handlers.
 	phantomjs.on('fail.load', function(url) {
