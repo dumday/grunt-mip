@@ -275,7 +275,7 @@ module.exports = function(grunt) {
 		};
 
 		status = {blanketTotal: 0, blanketPass: 0, blanketFail: 0};
-		coverageThreshold = grunt.option('threshold') || options.threshold;
+		coverageThreshold = grunt.option('threshold') || options.threshold || 85;
 
 		modulePattern = grunt.option('modulePattern') || options.modulePattern;
 		if (modulePattern) {
