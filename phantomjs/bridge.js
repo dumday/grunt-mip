@@ -47,7 +47,7 @@
 		runner.on('end', function() {
 			// added
 			var covData = window.__coverage__ || false;
-			sendMessage('coverage.done', covData);
+			sendMessage('coverage:done', covData);
 			window.blanket.onTestsDone();
 		});
 

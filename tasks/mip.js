@@ -114,7 +114,10 @@ module.exports = function(grunt) {
             // try to parse old data
             covObject = JSON.parse(oldCovData);
 
+            grunt.log.writeln('[Cov] files :'['yellow'].bold);
+
             for(var filename in covData){
+            	grunt.log.writeln(' - ' + filename);
                 covObject[filename] = covData[filename];
             }
 
@@ -137,7 +140,7 @@ module.exports = function(grunt) {
 			phantomjs.halt();
 		});
 
-		phantomjs.on('coverage.done', function(covData){
+		phantomjs.on('coverage:done', function(covData){
 			saveCov(covData);
 		});
 

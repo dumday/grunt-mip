@@ -3,7 +3,11 @@
   "description": "A grunt-mocha-istanbul-phantomjs task for tesing client-side javascript",
   "version": "0.0.4",
   "homepage": "https://github.com/zudd/grunt-mip",
-  "author": "Zudd <luuhug@gmail.com> (Hung Luu)",
+  "author": {
+    "name": "Zudd",
+    "email": "luuhug@gmail.com",
+    "url": "Hung Luu"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/zudd/grunt-mip.git"
@@ -52,5 +56,25 @@
   "directories": {
     "example": "example"
   },
-  "license": "MIT"
+  "license": "MIT",
+  "contributors": [
+    {
+      "name": "Hung Luu",
+      "email": "luuhug@gmail.com"
+    },
+    {
+      "name": "Kelly Miyashiro",
+      "email": "miyashiro.kelly@gmail.com"
+    },
+    {
+      "name": "Tony Narlock",
+      "email": "tony@git-pull.com"
+    }
+  ],
+  "readme": "A fork from [Grunt-blanket-mocha](https://github.com/GruntBlanketMocha/grunt-blanket-mocha) for generating coverage json file",
+  "readmeFilename": "README.md",
+  "gitHead": "9111951d24921762d69ca4676e2ef08041ca110c",
+  "_id": "grunt-mip@0.0.4",
+  "_shasum": "13e6c0563eb4a4af8a50c1f794ff44e5ba26caf3",
+  "_from": "grunt-mip@*"
 }
