@@ -3,13 +3,10 @@
   "description": "A grunt-mocha-istanbul-phantomjs task for tesing client-side javascript",
   "version": "0.0.1",
   "homepage": "https://github.com/zudd/grunt-mip",
-  "author": {
-    "name": "Zudd (Hung Luu)",
-    "email": "luuhug@gmail.com"
-  },
+  "author": "Zudd <luuhug@gmail.com> (Hung Luu)",
   "repository": {
     "type": "git",
-    "url": "https://github.com/zudd/grunt-mip"
+    "url": "git+https://github.com/zudd/grunt-mip.git"
   },
   "bugs": {
     "url": "https://github.com/zudd/grunt-mip/issues"
@@ -27,10 +24,10 @@
     "test": "grunt test"
   },
   "devDependencies": {
+    "chai": "^3.4.0",
     "grunt": "^0.4.5",
-    //"grunt-contrib-clean": "^0.5.0",
-    "grunt-contrib-jshint": "^0.9.2",
-    //"grunt-contrib-nodeunit": "^0.3.3"
+    "grunt-contrib-connect": "^0.11.2",
+    "grunt-contrib-jshint": "^0.9.2"
   },
   "peerDependencies": {
     "grunt": "~0.4.5"
@@ -46,5 +43,14 @@
     "istanbul"
   ],
   "dependencies": {
-  }
+    "blanket": "^1.1.9",
+    "grunt-lib-phantomjs": "^0.7.1",
+    "lodash": "^3.10.1",
+    "mocha": "^2.3.3"
+  },
+  "main": "Gruntfile.js",
+  "directories": {
+    "example": "example"
+  },
+  "license": "MIT"
 }
