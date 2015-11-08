@@ -263,7 +263,9 @@ module.exports    = function(grunt) {
 			// Fail with grunt.warn on first test failure
 			bail: false,
 			// Log script errors as grunt errors
-			logErrors: false
+			logErrors: false,
+			// Default threshold is 85%
+			threshold: 85
 		});
 
 		ok = true;
