@@ -16,7 +16,7 @@ A base usage guideline can be found on [grunt-blanket-mocha](https://github.com/
 
 ## Example
 
-###Step 1 . Install istanbul and grunt-mip and optional grunt-contrib-connect
+**Step 1 . Install istanbul and grunt-mip and optional grunt-contrib-connect**
 
 ```bash
 npm i -g istanbul
@@ -24,14 +24,14 @@ npm i -D grunt-mip
 npm i -D grunt-contrib-connect
 ```
 
-###Step 2. Instrument your js files
+**Step 2. Instrument your js files**
 
 ```bash
 istanbul instrument test/index.js
 istanbul instrument test/plugin.js
 ```
 
-###Step 2 . Config gruntfile
+**Step 3 . Config gruntfile**
 
 ```javascript
 // Gruntfile.js
@@ -68,7 +68,8 @@ module.exports = function(grunt) {
 	grunt.registerTask('test', ['connect', 'mip']);
 ```
 
-###Step 3. Convert coverage.json to html or lcov ( or something else)
+**Step 3. Convert coverage.json to html or lcov ( or something else)**
+
 
 ```bash
 istanbul report --root coverage lcov
@@ -80,6 +81,7 @@ You should used **only one** in mentioned 3 tools in a test case because you don
 
 If you want to change coverage tool, please delete the ```coverage``` folder before running a new test
 
+
 **NOTE :** This tool is designed to merge new reponses from test to test, it means :
 
 ```bash
@@ -87,7 +89,9 @@ When you run a test on http://localhost/test.html the first time, its results is
 
 Then you run a new test on http://localhost/another-test.html, its results will be merged to the old results and saved to coverage.json
 ```
+
 So it you are not intend to merge their results, you should delete or backup the ```coverage.json``` file somewhere outside the ```coverage``` folder
+
 
 ## Contribute
 
