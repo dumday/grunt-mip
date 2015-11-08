@@ -1,5 +1,7 @@
 // grunt-blanket-mocha 0.3.3
 //
+// Copyright (C) 2015 Hung Luu, MIT License
+//
 // Copyright (C) 2013 Dave Cadwallader, Model N, Inc.
 // Distributed under the MIT License
 //
@@ -92,53 +94,8 @@ module.exports = function(grunt) {
         var listeners = {};
         var suites = [];
 
-        phantomjs.on('blanket:done', function(covData) {
-            grunt.log.writeln(typeof covData);
+        phantomjs.on('blanket:done', function() {
             phantomjs.halt();
-        });
-
-        // Added
-        phantomjs.on('coverage:save', function(covData){
-            if(covData){
-                var fs = require('fs');
-
-                try{
-                    fs.mkdirSync('coverage');
-                }catch(e){
-                    if (e.code != 'EEXIST' ) throw e;
-                }
-
-                grunt.log.writeln('[Cov]Writing coverage to coverage/coverage.json'['yellow'].bold);
-
-                var oldCovData, covObject;
-
-                try{
-                    oldCovData = fs.readFileSync('coverage/coverage.json', {encoding:'utf8'});
-                }
-                catch(e){
-                    // file not found
-                    if (e.code != 'ENOENT') throw e;
-                    else
-                        oldCovData = '{}';
-                }
-
-                // try to parse old data
-                covObject = JSON.parse(oldCovData);
-
-                grunt.log.writeln('[Cov] files :'['yellow'].bold);
-
-                for(var filename in covData){
-                    grunt.log.writeln(' - ' + filename);
-                    covObject[filename] = covData[filename];
-                }
-
-                fs.writeFileSync('coverage/coverage.json', JSON.stringify(covObject));
-
-                grunt.log.writeln('[Cov]Done'['yellow'].bold);
-            }
-            else{
-                grunt.log.writeln('[Cov]No coverage data generated');
-            }
         });
 
         phantomjs.on('blanket:fileDone', function(thisTotal, filename) {
@@ -167,7 +124,7 @@ module.exports = function(grunt) {
 
             if (modulePatternRegex) {
                 var match = filename.match(modulePatternRegex);
-				if (!match) return;
+                if (!match) return;
                 var moduleName = match[1];
                 if(!totals.moduleTotalStatements.hasOwnProperty(moduleName)) {
                     totals.moduleTotalStatements[moduleName] = 0;
@@ -223,6 +180,51 @@ module.exports = function(grunt) {
         };
     }());
 
+    // Added
+    phantomjs.on('coverage:save', function(covData){
+        if(covData){
+            var fs = require('fs');
+
+            try{
+                fs.mkdirSync('coverage');
+            }catch(e){
+                if (e.code != 'EEXIST' ) throw e;
+            }
+
+            grunt.log.writeln('[Cov]Writing coverage to coverage/coverage.json'['yellow'].bold);
+
+            var oldCovData, covObject;
+
+            try{
+                oldCovData = fs.readFileSync('coverage/coverage.json', {encoding:'utf8'});
+            }
+            catch(e){
+                // file not found
+                if (e.code != 'ENOENT') throw e;
+                else
+                    oldCovData = '{}';
+            }
+
+            // try to parse old data
+            covObject = JSON.parse(oldCovData);
+
+            grunt.log.writeln('[Cov] files :'['yellow'].bold);
+
+            for(var filename in covData){
+                grunt.log.writeln(' - ' + filename);
+                covObject[filename] = covData[filename];
+            }
+
+            fs.writeFileSync('coverage/coverage.json', JSON.stringify(covObject));
+
+            grunt.log.writeln('[Cov]Done'['yellow'].bold);
+        }
+        else{
+            grunt.log.writeln('[Cov]No coverage data generated');
+        }
+    });
+
+
     // Built-in error handlers.
     phantomjs.on('fail.load', function(url) {
         phantomjs.halt();
@@ -263,7 +265,9 @@ module.exports = function(grunt) {
             // Fail with grunt.warn on first test failure
             bail: false,
             // Log script errors as grunt errors
-            logErrors: false
+            logErrors: false,
+            // added, default 85%
+            threshold: 85
         });
 
         ok = true;
@@ -275,7 +279,7 @@ module.exports = function(grunt) {
         };
 
         status = {blanketTotal: 0, blanketPass: 0, blanketFail: 0};
-        coverageThreshold = grunt.option('threshold') || options.threshold || 85;
+        coverageThreshold = grunt.option('threshold') || options.threshold;
 
         modulePattern = grunt.option('modulePattern') || options.modulePattern;
         if (modulePattern) {
