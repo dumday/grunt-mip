@@ -27,8 +27,8 @@ npm i -D grunt-contrib-connect
 **Step 2. Instrument your js files**
 
 ```bash
-istanbul instrument test/index.js
-istanbul instrument test/plugin.js
+istanbul instrument test/index.js > test/index.cov.js
+istanbul instrument test/plugin.js > test/plugin.cov.js
 ```
 
 **Step 3 . Config gruntfile**
