@@ -90,7 +90,7 @@ When you run a test on http://localhost/test.html the first time, its results is
 Then you run a new test on http://localhost/another-test.html, its results will be merged to the old results and saved to coverage.json
 ```
 
-So it you are not intend to merge their results, you should delete or backup the ```coverage.json``` file somewhere outside the ```coverage``` folder
+So if you don't intend to merge their results, you should delete or backup the ```coverage.json``` file somewhere outside the ```coverage``` folder
 
 
 ## Contribute
