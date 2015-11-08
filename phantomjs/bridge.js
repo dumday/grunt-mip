@@ -1,7 +1,6 @@
 /*
  * Is injected into the spec runner file
- *
- * Copyright (c) 2015 Hung Luu
+
  * Copyright (c) 2012 Kelly Miyashiro
  * Copyright (c) 2012 "Cowboy" Ben Alman
  * Licensed under the MIT license.

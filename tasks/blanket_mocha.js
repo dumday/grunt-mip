@@ -1,6 +1,4 @@
-// grunt-mip 1.0.6
-//
-// Copyright (C) 2015 Hung Luu, MIT License
+// grunt-blanket-mocha 0.3.3
 //
 // Copyright (C) 2013 Dave Cadwallader, Model N, Inc.
 // Distributed under the MIT License
@@ -11,6 +9,7 @@
 // Based on grunt-mocha
 // https://github.com/kmiyashiro/grunt-mocha
 // Copyright (c) 2012 "Cowboy" Ben Alman, contributors
+
 
 'use strict';
 
@@ -93,50 +92,6 @@ module.exports = function(grunt) {
         var listeners = {};
         var suites = [];
 
-        // Added
-        phantomjs.on('coverage:save', function(covData){
-            if(covData){
-                var fs = require('fs');
-
-                try{
-                    fs.mkdirSync('coverage');
-                }catch(e){
-                    if (e.code != 'EEXIST' ) throw e;
-                }
-
-                grunt.log.writeln('[Cov]Writing coverage to coverage/coverage.json'['yellow'].bold);
-
-                var oldCovData, covObject;
-
-                try{
-                    oldCovData = fs.readFileSync('coverage/coverage.json', {encoding:'utf8'});
-                }
-                catch(e){
-                    // file not found
-                    if (e.code != 'ENOENT') throw e;
-                    else
-                        oldCovData = '{}';
-                }
-
-                // try to parse old data
-                covObject = JSON.parse(oldCovData);
-
-                grunt.log.writeln('[Cov] files :'['yellow'].bold);
-
-                for(var filename in covData){
-                    grunt.log.writeln(' - ' + filename);
-                    covObject[filename] = covData[filename];
-                }
-
-                fs.writeFileSync('coverage/coverage.json', JSON.stringify(covObject));
-
-                grunt.log.writeln('[Cov]Done'['yellow'].bold);
-            }
-            else{
-                grunt.log.writeln('[Cov]No coverage data generated');
-            }
-        });
-
         phantomjs.on('blanket:done', function() {
             phantomjs.halt();
         });
@@ -167,7 +122,7 @@ module.exports = function(grunt) {
 
             if (modulePatternRegex) {
                 var match = filename.match(modulePatternRegex);
-                if (!match) return;
+				if (!match) return;
                 var moduleName = match[1];
                 if(!totals.moduleTotalStatements.hasOwnProperty(moduleName)) {
                     totals.moduleTotalStatements[moduleName] = 0;
@@ -361,191 +316,191 @@ module.exports = function(grunt) {
 
         // Process each filepath in-order.
         grunt.util.async.forEachSeries(urls, function(url, next) {
-            grunt.log.writeln('Testing: ' + url);
+                    grunt.log.writeln('Testing: ' + url);
 
-            // create a new mocha runner façade
-            var runner = new EventEmitter();
-            phantomjsEventManager.add(url, runner);
+                    // create a new mocha runner façade
+                    var runner = new EventEmitter();
+                    phantomjsEventManager.add(url, runner);
 
-            // Clear runner event listener when test is over
-            runner.on('end', function() {
-                phantomjsEventManager.remove(url);
-            });
+                    // Clear runner event listener when test is over
+                    runner.on('end', function() {
+                        phantomjsEventManager.remove(url);
+                    });
 
-            // Set Mocha reporter
-            var Reporter = null;
-            if (reporters[options.reporter]) {
-                Reporter = reporters[options.reporter];
-            } else {
-                // Resolve external reporter module
-                var externalReporter;
-                try {
-                    externalReporter = require.resolve(options.reporter);
-                } catch (e) {
-                    // Resolve to local path
-                    externalReporter = path.resolve(options.reporter);
-                }
-
-                if (externalReporter) {
-                    try {
-                        Reporter = require(externalReporter);
-                    }
-                    catch (e) { }
-                }
-            }
-            if (Reporter === null) {
-                grunt.fatal('Specified reporter is unknown or unresolvable: ' + options.reporter);
-            }
-            reporter = new Reporter(runner);
-
-            // Launch PhantomJS.
-            phantomjs.spawn(url, {
-                // Exit code to use if PhantomJS fails in an uncatchable way.
-                failCode: 90,
-                // Additional PhantomJS options.
-                options: PhantomjsOptions,
-                // Do stuff when done.
-                done: function(err) {
-                    var stats = runner.stats;
-                    testStats.push(stats);
-
-                    if (err) {
-                        // Show Growl notice
-                        // @TODO: Get an example of this
-                        // growl('PhantomJS Error!');
-
-                        // If there was a PhantomJS error, abort the series.
-                        grunt.fatal(err);
-                        done(false);
+                    // Set Mocha reporter
+                    var Reporter = null;
+                    if (reporters[options.reporter]) {
+                        Reporter = reporters[options.reporter];
                     } else {
-                        // If failures, show growl notice
-                        if (stats.failures > 0) {
-                            var reduced = helpers.reduceStats([stats]);
-                            var failMsg = reduced.failures + '/' + reduced.tests +
-                                    ' tests failed (' + reduced.duration + 's)';
-
-                            // Show Growl notice, if avail
-                            growl(failMsg, {
-                                image: asset('growl/error.png'),
-                                title: 'Failure in ' + grunt.task.current.target,
-                                priority: 3
-                            });
-
-                            // Bail tests if bail option is true
-                            if (options.bail) grunt.warn(failMsg);
+                        // Resolve external reporter module
+                        var externalReporter;
+                        try {
+                            externalReporter = require.resolve(options.reporter);
+                        } catch (e) {
+                            // Resolve to local path
+                            externalReporter = path.resolve(options.reporter);
                         }
 
-                        // Process next file/url
-                        next();
-                    }
-                }
-            });
-        },
-        // All tests have been run.
-        function() {
-            if (dest) {
-                // Restore console.log to original and write the output
-                console.log = consoleLog;
-                grunt.file.write(dest, output.join('\n'));
-            }
-            grunt.log.writeln();
-
-            var customThresholdMsg = "", failMsg = "";
-            var numCustomThreshold = Object.keys(customThreshold ).length;
-            if (numCustomThreshold) {
-                customThresholdMsg = "; " + numCustomThreshold + " files used custom threshold";
-            }
-
-            grunt.log.writeln("Per-File Coverage Results: (" + coverageThreshold + "% minimum" + customThresholdMsg + ")");
-
-            if (status.blanketFail > 0) {
-                failMsg = "FAIL : " + (status.blanketFail + "/" + status.blanketTotal + " files failed coverage");
-                grunt.log.write(failMsg.red);
-                grunt.log.writeln();
-                ok = false;
-            } else {
-                var blanketPassMsg = "PASS : " + status.blanketPass + " files passed coverage ";
-                grunt.log.write(blanketPassMsg.green);
-                grunt.log.writeln();
-            }
-
-            var moduleThreshold = grunt.option('moduleThreshold') || options.moduleThreshold;
-
-            if (moduleThreshold) {
-
-                grunt.log.writeln();
-                var customModuleThresholdMsg = "";
-                var numCustomModuleThreshold = Object.keys(customModuleThreshold ).length;
-                if (numCustomModuleThreshold) {
-                    customModuleThresholdMsg = "; " + numCustomModuleThreshold + " modules used custom threshold";
-                }
-                grunt.log.writeln("Per-Module Coverage Results: (" + moduleThreshold + "% minimum" + customModuleThresholdMsg + ")");
-
-                if (modulePatternRegex) {
-                    for (var thisModuleName in totals.moduleTotalStatements) {
-                        if (totals.moduleTotalStatements.hasOwnProperty(thisModuleName)) {
-                            var moduleTotalSt = totals.moduleTotalStatements[thisModuleName];
-                            var moduleTotalCovSt = totals.moduleTotalCoveredStatements[thisModuleName];
-
-                            var threshold = moduleThreshold;
-                            if (customModuleThreshold[thisModuleName]) {
-                                threshold = customModuleThreshold[thisModuleName];
+                        if (externalReporter) {
+                            try {
+                                Reporter = require(externalReporter);
                             }
-
-                            printPassFailMessage(thisModuleName, moduleTotalCovSt, moduleTotalSt, threshold, /*printPassing*/true);
+                            catch (e) { }
                         }
                     }
-                }
-            }
+                    if (Reporter === null) {
+                        grunt.fatal('Specified reporter is unknown or unresolvable: ' + options.reporter);
+                    }
+                    reporter = new Reporter(runner);
 
-            var globalThreshold = grunt.option('globalThreshold') || options.globalThreshold;
+                    // Launch PhantomJS.
+                    phantomjs.spawn(url, {
+                        // Exit code to use if PhantomJS fails in an uncatchable way.
+                        failCode: 90,
+                        // Additional PhantomJS options.
+                        options: PhantomjsOptions,
+                        // Do stuff when done.
+                        done: function(err) {
+                            var stats = runner.stats;
+                            testStats.push(stats);
 
-            if (globalThreshold) {
-                grunt.log.writeln();
-                grunt.log.writeln("Global Coverage Results: (" + globalThreshold + "% minimum)");
-                printPassFailMessage("global", totals.coveredLines, totals.totalLines, globalThreshold, /*printPassing*/true);
-            }
-            grunt.log.writeln();
+                            if (err) {
+                                // Show Growl notice
+                                // @TODO: Get an example of this
+                                // growl('PhantomJS Error!');
 
-            grunt.log.write("Unit Test Results: ");
+                                // If there was a PhantomJS error, abort the series.
+                                grunt.fatal(err);
+                                done(false);
+                            } else {
+                                // If failures, show growl notice
+                                if (stats.failures > 0) {
+                                    var reduced = helpers.reduceStats([stats]);
+                                    var failMsg = reduced.failures + '/' + reduced.tests +
+                                            ' tests failed (' + reduced.duration + 's)';
 
-            var stats = helpers.reduceStats(testStats);
+                                    // Show Growl notice, if avail
+                                    growl(failMsg, {
+                                        image: asset('growl/error.png'),
+                                        title: 'Failure in ' + grunt.task.current.target,
+                                        priority: 3
+                                    });
 
-            if (stats.failures === 0) {
-                var okMsg = stats.tests + ' specs passed!' + ' (' + stats.duration + 's)';
+                                    // Bail tests if bail option is true
+                                    if (options.bail) grunt.warn(failMsg);
+                                }
 
-                growl(okMsg, {
-                    image: asset('growl/ok.png'),
-                    title: 'Tests passed',
-                    priority: 3
+                                // Process next file/url
+                                next();
+                            }
+                        }
+                    });
+                },
+                // All tests have been run.
+                function() {
+                    if (dest) {
+                        // Restore console.log to original and write the output
+                        console.log = consoleLog;
+                        grunt.file.write(dest, output.join('\n'));
+                    }
+                    grunt.log.writeln();
+
+                    var customThresholdMsg = "", failMsg = "";
+                    var numCustomThreshold = Object.keys(customThreshold ).length;
+                    if (numCustomThreshold) {
+                        customThresholdMsg = "; " + numCustomThreshold + " files used custom threshold";
+                    }
+
+                    grunt.log.writeln("Per-File Coverage Results: (" + coverageThreshold + "% minimum" + customThresholdMsg + ")");
+
+                    if (status.blanketFail > 0) {
+                        failMsg = "FAIL : " + (status.blanketFail + "/" + status.blanketTotal + " files failed coverage");
+                        grunt.log.write(failMsg.red);
+                        grunt.log.writeln();
+                        ok = false;
+                    } else {
+                        var blanketPassMsg = "PASS : " + status.blanketPass + " files passed coverage ";
+                        grunt.log.write(blanketPassMsg.green);
+                        grunt.log.writeln();
+                    }
+
+                    var moduleThreshold = grunt.option('moduleThreshold') || options.moduleThreshold;
+
+                    if (moduleThreshold) {
+
+                        grunt.log.writeln();
+                        var customModuleThresholdMsg = "";
+                        var numCustomModuleThreshold = Object.keys(customModuleThreshold ).length;
+                        if (numCustomModuleThreshold) {
+                            customModuleThresholdMsg = "; " + numCustomModuleThreshold + " modules used custom threshold";
+                        }
+                        grunt.log.writeln("Per-Module Coverage Results: (" + moduleThreshold + "% minimum" + customModuleThresholdMsg + ")");
+
+                        if (modulePatternRegex) {
+                            for (var thisModuleName in totals.moduleTotalStatements) {
+                                if (totals.moduleTotalStatements.hasOwnProperty(thisModuleName)) {
+                                    var moduleTotalSt = totals.moduleTotalStatements[thisModuleName];
+                                    var moduleTotalCovSt = totals.moduleTotalCoveredStatements[thisModuleName];
+
+                                    var threshold = moduleThreshold;
+                                    if (customModuleThreshold[thisModuleName]) {
+                                        threshold = customModuleThreshold[thisModuleName];
+                                    }
+
+                                    printPassFailMessage(thisModuleName, moduleTotalCovSt, moduleTotalSt, threshold, /*printPassing*/true);
+                                }
+                            }
+                        }
+                    }
+
+                    var globalThreshold = grunt.option('globalThreshold') || options.globalThreshold;
+
+                    if (globalThreshold) {
+                        grunt.log.writeln();
+                        grunt.log.writeln("Global Coverage Results: (" + globalThreshold + "% minimum)");
+                        printPassFailMessage("global", totals.coveredLines, totals.totalLines, globalThreshold, /*printPassing*/true);
+                    }
+                    grunt.log.writeln();
+
+                    grunt.log.write("Unit Test Results: ");
+
+                    var stats = helpers.reduceStats(testStats);
+
+                    if (stats.failures === 0) {
+                        var okMsg = stats.tests + ' specs passed!' + ' (' + stats.duration + 's)';
+
+                        growl(okMsg, {
+                            image: asset('growl/ok.png'),
+                            title: 'Tests passed',
+                            priority: 3
+                        });
+
+                        grunt.log.write(okMsg.green);
+                        grunt.log.writeln();
+                    } else {
+                        ok = false;
+                        failMsg = stats.failures + '/' + stats.tests + ' tests failed (' +
+                                stats.duration + 's)';
+
+                        // Show Growl notice, if avail
+                        growl(failMsg, {
+                            image: asset('growl/error.png'),
+                            title: 'Failure in ' + grunt.task.current.target,
+                            priority: 3
+                        });
+
+                        grunt.log.write(failMsg.red);
+                        grunt.log.writeln();
+                    }
+
+                    if (!ok) {
+                        grunt.warn("Issues were found.");
+                    } else {
+                        grunt.log.ok("No issues found.");
+                    }
+
+                    // Async test done
+                    done();
                 });
-
-                grunt.log.write(okMsg.green);
-                grunt.log.writeln();
-            } else {
-                ok = false;
-                failMsg = stats.failures + '/' + stats.tests + ' tests failed (' +
-                        stats.duration + 's)';
-
-                // Show Growl notice, if avail
-                growl(failMsg, {
-                    image: asset('growl/error.png'),
-                    title: 'Failure in ' + grunt.task.current.target,
-                    priority: 3
-                });
-
-                grunt.log.write(failMsg.red);
-                grunt.log.writeln();
-            }
-
-            if (!ok) {
-                grunt.warn("Issues were found.");
-            } else {
-                grunt.log.ok("No issues found.");
-            }
-
-            // Async test done
-            done();
-        });
     });
 };
