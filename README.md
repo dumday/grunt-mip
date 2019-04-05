@@ -1,5 +1,9 @@
 A fork from [Grunt-blanket-mocha](https://github.com/GruntBlanketMocha/grunt-blanket-mocha) for automatically generating coverage data and save to file.
 
+# DEPRECATED WARNING:
+
+Since I published this package 4 years ago, many dependencies of this module has been deprecated or moved to other major versions. The current state of `grunt-mip` will not work as intended and, or generated deprecated warning message. For better coverage testing experience, you may consider using [Jest](https://jestjs.io/)
+
 ## Supports
 
 [Istanbul](https://github.com/gotwarlost/istanbul) or [JSCover](https://github.com/tntim96/JSCover) or [JScoverage](https://www.npmjs.com/package/jscoverage)
@@ -101,7 +105,7 @@ Here is some simple steps
 
 1. Fork, then clone the repo at git@github.com:your-username/grunt-mip.git
 
-2. Push to your fork and submit a [pull request](https://github.com/zudd/grunt-mip/compare/)
+2. Push to your fork and submit a [pull request](https://github.com/hungluu/grunt-mip/compare/)
 
 3. Write a good commit message
 
